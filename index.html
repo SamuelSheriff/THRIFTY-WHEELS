@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3FTYWHLS — Thrifty Wheels | Premium Pre-Owned Vehicles in Nairobi</title>
+  <meta name="description" content="3FTYWHLS (Thrifty Wheels) — Browse our curated selection of premium pre-owned vehicles in Nairobi, Kenya. Mercedes Benz, BMW, Land Rover and more." />
+  <meta property="og:title" content="3FTYWHLS — Thrifty Wheels" />
+  <meta property="og:description" content="Premium pre-owned vehicles. Nairobi, Kenya." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo" id="logo-link">
+        <span class="logo-mark">3FTY</span><span class="logo-accent">WHLS</span>
+        <span class="logo-sub">THRIFTY WHEELS</span>
+      </a>
+      <nav class="nav-links" id="nav-links">
+        <a href="#listings" class="nav-link">Inventory</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+      <button class="burger" id="burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Nairobi's Finest Pre-Owned Cars</p>
+      <h1 class="hero-title">Drive <span class="gradient-text">Premium.</span><br />Pay Smart.</h1>
+      <p class="hero-desc">Hand-picked, thoroughly inspected vehicles — from luxury sedans to capable SUVs. Every car tells a story. Find yours.</p>
+      <div class="hero-cta-group">
+        <a href="#listings" class="btn btn-primary" id="hero-browse-btn">Browse Inventory</a>
+        <a href="https://wa.me/254700000000" target="_blank" rel="noopener" class="btn btn-outline" id="hero-whatsapp-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Chat on WhatsApp
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">5</span><span class="stat-label">Cars Available</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">750K</span><span class="stat-label">Starting From</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">NBO</span><span class="stat-label">Nairobi, Kenya</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-floating" id="hero-floating-card">
+        <div class="float-badge">HOT DEAL</div>
+        <div class="float-car-name">Land Rover Discovery IV</div>
+        <div class="float-price">KSh 4.5M</div>
+        <div class="float-tags">
+          <span>2016</span><span>Diesel</span><span>7-Seater</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTER BAR -->
+  <section class="filter-section" id="listings">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Our <span class="gradient-text">Inventory</span></h2>
+        <p class="section-sub">All vehicles are ready for viewing in Nairobi</p>
+      </div>
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="all" id="filter-all">All Vehicles</button>
+        <button class="filter-btn" data-filter="suv" id="filter-suv">SUVs</button>
+        <button class="filter-btn" data-filter="sedan" id="filter-sedan">Sedans</button>
+        <button class="filter-btn" data-filter="hybrid" id="filter-hybrid">Hybrid</button>
+        <button class="filter-btn" data-filter="luxury" id="filter-luxury">Luxury</button>
+      </div>
+      <div class="sort-bar">
+        <span class="results-count" id="results-count">5 vehicles found</span>
+        <select class="sort-select" id="sort-select">
+          <option value="default">Sort: Default</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAR GRID -->
+  <section class="cars-section">
+    <div class="container">
+      <div class="cars-grid" id="cars-grid"></div>
+    </div>
+  </section>
+
+  <!-- CAR MODAL -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-car-name">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close" aria-label="Close">&#10005;</button>
+      <div class="modal-layout">
+        <div class="modal-gallery">
+          <div class="gallery-main" id="gallery-main">
+            <img id="gallery-main-img" src="" alt="Car main image" />
+            <button class="gallery-arrow gallery-prev" id="gallery-prev" aria-label="Previous">&#8592;</button>
+            <button class="gallery-arrow gallery-next" id="gallery-next" aria-label="Next">&#8594;</button>
+            <div class="gallery-counter" id="gallery-counter">1 / 1</div>
+          </div>
+          <div class="gallery-thumbs" id="gallery-thumbs"></div>
+        </div>
+        <div class="modal-info">
+          <div class="modal-badge" id="modal-badge">AVAILABLE</div>
+          <h2 class="modal-car-name" id="modal-car-name"></h2>
+          <div class="modal-price" id="modal-price"></div>
+          <div class="modal-specs" id="modal-specs"></div>
+          <div class="modal-features" id="modal-features"></div>
+          <a class="btn btn-primary btn-full modal-wa" id="modal-wa" href="#" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Enquire on WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about-section" id="about">
+    <div class="container about-inner">
+      <div class="about-text">
+        <p class="hero-eyebrow">About 3FTYWHLS</p>
+        <h2 class="section-title">Premium Cars.<br /><span class="gradient-text">Real Value.</span></h2>
+        <p class="about-para">At Thrifty Wheels we believe that quality and affordability are not opposites. Every vehicle in our inventory has been carefully selected, inspected, and priced to deliver exceptional value.</p>
+        <p class="about-para">Based in Nairobi, we serve buyers across Kenya with transparent deals, clean logbooks, and honest specs. No gimmicks — just great cars.</p>
+        <div class="about-pillars">
+          <div class="pillar" id="pillar-quality">
+            <div class="pillar-icon">&#10003;</div>
+            <div>
+              <strong>Verified Vehicles</strong>
+              <p>Clean logbooks and duty-paid where applicable</p>
+            </div>
+          </div>
+          <div class="pillar" id="pillar-price">
+            <div class="pillar-icon">&#128176;</div>
+            <div>
+              <strong>Honest Pricing</strong>
+              <p>No hidden charges. What you see is what you pay</p>
+            </div>
+          </div>
+          <div class="pillar" id="pillar-service">
+            <div class="pillar-icon">&#129309;</div>
+            <div>
+              <strong>Personal Service</strong>
+              <p>Talk directly with the dealer — no middlemen</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="about-visual">
+        <div class="about-glow-card" id="about-glow-card">
+          <div class="glow-ring"></div>
+          <div class="about-card-content">
+            <div class="ac-icon">&#128664;</div>
+            <div class="ac-title">Ready to View</div>
+            <div class="ac-sub">All cars available for test drives in Nairobi</div>
+            <div class="ac-location">&#128205; Nairobi, Kenya</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Get In <span class="gradient-text">Touch</span></h2>
+        <p class="section-sub">Interested in a car? Drop us a message and we will get back to you fast.</p>
+      </div>
+      <div class="contact-cards">
+        <a href="https://wa.me/254700000000?text=Hi%2C%20I%27m%20interested%20in%20a%20car%20from%203FTYWHLS" target="_blank" rel="noopener" class="contact-card" id="contact-wa">
+          <div class="cc-icon wa-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </div>
+          <div class="cc-label">WhatsApp Us</div>
+          <div class="cc-sub">Quick replies, 7 days a week</div>
+        </a>
+        <div class="contact-card" id="contact-location">
+          <div class="cc-icon loc-icon">&#128205;</div>
+          <div class="cc-label">Location</div>
+          <div class="cc-sub">Nairobi, Kenya<br />Available for viewings</div>
+        </div>
+        <div class="contact-card" id="contact-hours">
+          <div class="cc-icon hrs-icon">&#128336;</div>
+          <div class="cc-label">Working Hours</div>
+          <div class="cc-sub">Mon &ndash; Sat: 8am &ndash; 6pm<br />Sun: By appointment</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo"><span class="logo-mark">3FTY</span><span class="logo-accent">WHLS</span></div>
+        <p>Thrifty Wheels &mdash; Nairobi's trusted source for premium pre-owned vehicles.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#listings">Inventory</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 3FTYWHLS &mdash; Thrifty Wheels. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
