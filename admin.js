@@ -114,6 +114,17 @@ function updateMetrics() {
   document.getElementById('metric-sold-cars').textContent = soldCars;
 }
 
+// ─── Security Helper ───────────────────────────────────────────
+function escapeHTML(str) {
+  if (typeof str !== 'string') return str || '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ─── Dual View Rendering (Desktop Table & Mobile Cards) ────────
 function renderAdminTable() {
   updateMetrics();
@@ -158,29 +169,29 @@ function renderAdminTable() {
         if (y) yearSpec = y.value;
       }
 
-      const tagsHtml = (v.tags || []).map(t => `<span class="tag-chip">${t}</span>`).join('');
+      const tagsHtml = (v.tags || []).map(t => `<span class="tag-chip">${escapeHTML(t)}</span>`).join('');
 
       tr.innerHTML = `
         <td>
           <div class="table-car-cell">
-            <img src="${thumbSrc}" alt="${v.name}" class="table-thumb" onerror="this.src='https://via.placeholder.com/80x60?text=No+Img'" />
+            <img src="${thumbSrc}" alt="${escapeHTML(v.name)}" class="table-thumb" onerror="this.onerror=null;this.src='https://via.placeholder.com/80x60?text=No+Img'" />
             <div>
-              <div class="table-car-name">${v.name}</div>
-              <div class="table-car-sub">${v.subtitle || ''}</div>
+              <div class="table-car-name">${escapeHTML(v.name)}</div>
+              <div class="table-car-sub">${escapeHTML(v.subtitle || '')}</div>
             </div>
           </div>
         </td>
         <td>${tagsHtml}</td>
         <td>
-          <span class="price-text">${v.price}</span>
+          <span class="price-text">${escapeHTML(v.price)}</span>
           ${v.negotiable ? '<span class="neg-pill">neg.</span>' : ''}
         </td>
         <td>
           <span class="status-badge ${status}" onclick="cycleCarStatus('${v.id}')" style="cursor: pointer;" title="Click to change status">
-            ${status} 🔄
+            ${escapeHTML(status)} 🔄
           </span>
         </td>
-        <td>${yearSpec}</td>
+        <td>${escapeHTML(yearSpec)}</td>
         <td>📷 ${v.images ? v.images.length : 0}</td>
         <td style="text-align: right;">
           <div class="action-btns">
@@ -214,24 +225,24 @@ function renderMobileCards(filtered) {
     
     const thumbSrc = v.images && v.images.length > 0 ? v.images[0] : '';
     const status = v.status || 'available';
-    const tagsHtml = (v.tags || []).map(t => `<span class="tag-chip">${t}</span>`).join('');
+    const tagsHtml = (v.tags || []).map(t => `<span class="tag-chip">${escapeHTML(t)}</span>`).join('');
 
     card.innerHTML = `
       <div class="mcc-header">
-        <img src="${thumbSrc}" alt="${v.name}" class="mcc-thumb" onerror="this.src='https://via.placeholder.com/80x60?text=No+Img'" />
+        <img src="${thumbSrc}" alt="${escapeHTML(v.name)}" class="mcc-thumb" onerror="this.onerror=null;this.src='https://via.placeholder.com/80x60?text=No+Img'" />
         <div class="mcc-info">
-          <div class="mcc-title">${v.name}</div>
-          <div class="mcc-sub">${v.subtitle || ''}</div>
+          <div class="mcc-title">${escapeHTML(v.name)}</div>
+          <div class="mcc-sub">${escapeHTML(v.subtitle || '')}</div>
           <div style="margin-top: 6px;">
             <span class="status-badge ${status}" onclick="cycleCarStatus('${v.id}')" style="cursor: pointer;">
-              ${status} 🔄
+              ${escapeHTML(status)} 🔄
             </span>
           </div>
         </div>
       </div>
       <div class="mcc-mid">
         <div>
-          <span class="mcc-price">${v.price}</span>
+          <span class="mcc-price">${escapeHTML(v.price)}</span>
           ${v.negotiable ? '<span class="neg-pill">neg.</span>' : ''}
         </div>
         <div>${tagsHtml}</div>
@@ -380,6 +391,12 @@ async function saveVehicleForm() {
   const subtitle = document.getElementById('form-subtitle').value.trim();
   const price = document.getElementById('form-price').value.trim();
   const priceNum = Number(document.getElementById('form-price-num').value) || 0;
+
+  if (!name || !price) {
+    showToast('⚠️ Please enter a valid vehicle name and price.');
+    return;
+  }
+
   const status = document.getElementById('form-status').value;
   const negotiable = document.getElementById('form-negotiable').checked;
 
