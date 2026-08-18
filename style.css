@@ -212,6 +212,19 @@ a { text-decoration: none; color: inherit; }
   align-self: center;
 }
 
+/* Logo image (replaces text mark in navbar) */
+.logo-img {
+  height: 46px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
+}
+
+.logo {
+  align-items: center;
+}
+
 .nav-links { display: flex; gap: 8px; }
 
 .nav-link {
