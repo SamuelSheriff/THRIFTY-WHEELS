@@ -1,8 +1,3 @@
--- ═══════════════════════════════════════════════════════════════
--- 3FTYWHLS — Neon Serverless PostgreSQL Database Schema
--- Paste this script into your Neon Console SQL Editor (https://console.neon.tech)
--- ═══════════════════════════════════════════════════════════════
-
 -- 1. Create Vehicles Table
 CREATE TABLE IF NOT EXISTS vehicles (
   id TEXT PRIMARY KEY,
@@ -11,7 +6,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   price TEXT NOT NULL,
   price_num BIGINT NOT NULL DEFAULT 0,
   negotiable BOOLEAN DEFAULT false,
-  status TEXT DEFAULT 'available', -- 'available' | 'reserved' | 'sold'
+  status TEXT DEFAULT 'available',
   tags TEXT[],
   specs JSONB DEFAULT '[]'::jsonb,
   features TEXT[],
@@ -52,7 +47,7 @@ VALUES
 (
   'bmw-x1',
   '2016 BMW X1',
-  'Compact Luxury SUV — New Shape',
+  'Compact Luxury SUV -- New Shape',
   'KSh 2.08M',
   2080000,
   false,
@@ -73,7 +68,7 @@ VALUES
 (
   'honda-insight',
   'Honda Insight Hybrid',
-  'Fuel-Efficient Hybrid — Fully Black',
+  'Fuel-Efficient Hybrid -- Fully Black',
   'KSh 750K',
   750000,
   true,
@@ -93,7 +88,7 @@ VALUES
 (
   'hyundai-santafe',
   'Hyundai Santa Fe',
-  '7-Seater Family SUV — Local 2015',
+  '7-Seater Family SUV -- Local 2015',
   'KSh 2.4M',
   2400000,
   true,
@@ -113,7 +108,7 @@ VALUES
 (
   'landrover-discovery',
   'Land Rover Discovery IV XS',
-  'SDV6 Turbo Diesel — Duty Paid · Clean Logbook',
+  'SDV6 Turbo Diesel -- Duty Paid Clean Logbook',
   'KSh 4.5M',
   4500000,
   false,
@@ -133,7 +128,7 @@ VALUES
 (
   'toyota-vanguard',
   '2009 Toyota Vanguard',
-  '7-Seater Utility SUV — Sunroof & Heated Seats',
+  '7-Seater Utility SUV -- Sunroof & Heated Seats',
   'KSh 1.15M',
   1150000,
   true,

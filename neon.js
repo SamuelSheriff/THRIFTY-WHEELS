@@ -3,10 +3,11 @@
    ═══════════════════════════════════════════════════════════════ */
 
 const NEON_STORAGE_KEY = '3ftywhls_neon_db_url';
+const DEFAULT_NEON_URL = 'postgresql://neondb_owner:npg_ncImAMLqST80@ep-bold-cake-ayd4uup4-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require';
 
 // Reads configured connection string or default
 function getNeonConnectionString() {
-  return localStorage.getItem(NEON_STORAGE_KEY) || '';
+  return localStorage.getItem(NEON_STORAGE_KEY) || DEFAULT_NEON_URL;
 }
 
 function setNeonConnectionString(url) {
@@ -36,13 +37,10 @@ async function executeNeonQuery(sqlText, params = []) {
   } 
   // 2. Fallback using Neon HTTP API fetch
   else {
-    // Parse endpoint host from connection string
-    // e.g. postgresql://user:pass@ep-cool-name-123456.us-east-2.aws.neon.tech/neondb?sslmode=require
     const match = connString.match(/@([^/]+)\/([^?]+)/);
     if (!match) throw new Error('Invalid Neon connection string format.');
 
     const host = match[1];
-    const dbName = match[2];
     const httpUrl = `https://${host}/sql`;
 
     const res = await fetch(httpUrl, {
