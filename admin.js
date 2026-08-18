@@ -2,16 +2,23 @@
    3FTYWHLS — Admin Management Portal Script
    ═══════════════════════════════════════════════════════════════ */
 
-const ADMIN_PIN = '3FTY2026';
+const DEFAULT_PIN = '3FTY2026';
 const AUTH_KEY = '3ftywhls_admin_auth';
+const PIN_STORAGE_KEY = '3ftywhls_admin_pin';
+
+// Returns the current active passcode (custom or default)
+function getAdminPin() {
+  return localStorage.getItem(PIN_STORAGE_KEY) || DEFAULT_PIN;
+}
 
 let editingCarId = null;
 
 // ─── Auth / Lock Screen ─────────────────────────────────────────
 function checkAuth() {
-  const isAuth = localStorage.getItem(AUTH_KEY) === 'true';
   const overlay = document.getElementById('pin-overlay');
   const main = document.getElementById('admin-main');
+  // Always show login screen on page load — never auto-login
+  const isAuth = sessionStorage.getItem(AUTH_KEY) === 'true';
 
   if (isAuth) {
     overlay.classList.remove('open');
@@ -30,8 +37,8 @@ function unlockAdmin() {
   const errEl = document.getElementById('pin-error');
   const val = input.value.trim();
 
-  if (val === ADMIN_PIN) {
-    localStorage.setItem(AUTH_KEY, 'true');
+  if (val === getAdminPin()) {
+    sessionStorage.setItem(AUTH_KEY, 'true');
     errEl.style.display = 'none';
     input.value = '';
     checkAuth();
@@ -43,9 +50,49 @@ function unlockAdmin() {
 }
 
 function lockAdmin() {
-  localStorage.removeItem(AUTH_KEY);
+  sessionStorage.removeItem(AUTH_KEY);
   checkAuth();
   showToast('🔒 Portal Locked');
+}
+
+// ─── Change Password ────────────────────────────────────────────
+function openChangePasswordModal() {
+  document.getElementById('cp-current').value = '';
+  document.getElementById('cp-new').value = '';
+  document.getElementById('cp-confirm').value = '';
+  document.getElementById('cp-error').style.display = 'none';
+  document.getElementById('change-pw-modal').classList.add('open');
+}
+
+function closeChangePasswordModal() {
+  document.getElementById('change-pw-modal').classList.remove('open');
+}
+
+function saveChangePassword() {
+  const current = document.getElementById('cp-current').value.trim();
+  const newPw = document.getElementById('cp-new').value.trim();
+  const confirm = document.getElementById('cp-confirm').value.trim();
+  const errEl = document.getElementById('cp-error');
+
+  if (current !== getAdminPin()) {
+    errEl.textContent = 'Current passcode is incorrect.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPw.length < 4) {
+    errEl.textContent = 'New passcode must be at least 4 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPw !== confirm) {
+    errEl.textContent = 'Passcodes do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  localStorage.setItem(PIN_STORAGE_KEY, newPw);
+  closeChangePasswordModal();
+  showToast('🔑 Passcode Updated Successfully');
 }
 
 // ─── Neon Database Connection UI ────────────────────────────────

@@ -796,28 +796,52 @@
   .table-card { display: none !important; }
   .mobile-cards-grid { display: flex !important; }
 
-  .admin-nav-inner { padding: 0 16px; }
-  .admin-nav-actions { gap: 6px; }
-  .nav-btn-text { display: none; } /* Show compact icon buttons on mobile */
+  /* Nav: tighten up */
+  .admin-nav { padding: 10px 0; }
+  .admin-nav-inner {
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .admin-nav-actions {
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  /* Icon-only buttons on mobile */
+  .nav-btn-text { display: none; }
+  .btn-sm { padding: 8px 11px; font-size: 0.82rem; }
   .nav-site-btn { padding: 8px 10px; }
 
-  .admin-container { padding: 0 16px; margin-top: 20px; }
-  .admin-title { font-size: 1.7rem; }
-  .admin-subtitle { font-size: 0.85rem; }
+  .admin-container { padding: 0 14px; margin-top: 18px; }
+  .admin-title { font-size: 1.55rem; }
+  .admin-subtitle { font-size: 0.83rem; }
 
   .admin-controls { flex-direction: column; align-items: stretch; gap: 10px; }
   .admin-filter-group { display: grid; grid-template-columns: 1fr 1fr; }
 
+  /* Metrics */
+  .metrics-grid { gap: 12px; margin-bottom: 20px; }
+
   /* Mobile Form Drawer */
   .admin-form-modal {
     max-height: 95vh;
-    padding: 22px 18px;
+    padding: 20px 16px;
     border-radius: var(--radius-lg);
   }
   .form-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  /* Mini-modal wider on mobile */
+  .admin-mini-modal { padding: 24px 20px; }
 }
 
 @media (max-width: 480px) {
-  .metrics-grid { grid-template-columns: 1fr; gap: 12px; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .mc-value { font-size: 1.2rem; }
+  .mc-icon { width: 40px; height: 40px; font-size: 1.1rem; }
   .mcc-actions { grid-template-columns: 1fr 1fr; }
+  .admin-header-row { gap: 12px; }
+  .btn-reset { width: 100%; justify-content: center; }
 }
+
