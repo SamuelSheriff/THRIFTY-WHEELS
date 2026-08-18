@@ -2,10 +2,11 @@
    3FTYWHLS — Thrifty Wheels | App Logic
    ═══════════════════════════════════════════════════════════════ */
 
-// ─── Car Data ──────────────────────────────────────────────────
+// ─── Car Data Storage ──────────────────────────────────────────
 const BASE = './';   // relative to index.html
+const STORAGE_KEY = '3ftywhls_inventory';
 
-const cars = [
+const defaultCars = [
   {
     id: 'mercedes-e300',
     name: '2010 Mercedes Benz E300',
@@ -13,6 +14,7 @@ const cars = [
     price: 'KSh 1.9M',
     priceNum: 1900000,
     negotiable: false,
+    status: 'available', // available | reserved | sold
     tags: ['sedan', 'luxury'],
     specs: [
       { label: 'Engine',       value: '3.0L V6 CGI N/A' },
@@ -41,6 +43,7 @@ const cars = [
     price: 'KSh 2.08M',
     priceNum: 2080000,
     negotiable: false,
+    status: 'available',
     tags: ['suv', 'luxury'],
     specs: [
       { label: 'Engine',       value: '1500cc Petrol' },
@@ -75,6 +78,7 @@ const cars = [
     price: 'KSh 750K',
     priceNum: 750000,
     negotiable: true,
+    status: 'available',
     tags: ['sedan', 'hybrid'],
     specs: [
       { label: 'Engine',       value: '1300cc Hybrid' },
@@ -105,6 +109,7 @@ const cars = [
     price: 'KSh 2.4M',
     priceNum: 2400000,
     negotiable: true,
+    status: 'available',
     tags: ['suv'],
     specs: [
       { label: 'Engine',       value: '2000cc Petrol' },
@@ -135,6 +140,7 @@ const cars = [
     price: 'KSh 4.5M',
     priceNum: 4500000,
     negotiable: false,
+    status: 'available',
     tags: ['suv', 'luxury'],
     specs: [
       { label: 'Engine',       value: '2993cc Turbo Diesel' },
@@ -158,10 +164,80 @@ const cars = [
       'Land Rover Discovery IV XS SDV6/WhatsApp Image 2026-08-13 at 3.11.58 PM.jpeg',
     ],
   },
+  {
+    id: 'toyota-vanguard',
+    name: '2009 Toyota Vanguard',
+    subtitle: '7-Seater Utility SUV — Sunroof & Heated Seats',
+    price: 'KSh 1.15M',
+    priceNum: 1150000,
+    negotiable: true,
+    status: 'available',
+    tags: ['suv'],
+    specs: [
+      { label: 'Engine',       value: '2500cc Petrol' },
+      { label: 'Seats',        value: '7 Seater' },
+      { label: 'Year',         value: '2009' },
+      { label: 'Sunroof',      value: 'Sunroof' },
+      { label: 'Features',     value: 'Electric Heated Seats' },
+      { label: 'Fuel',         value: 'Petrol' },
+    ],
+    features: ['7 Seater', 'Sunroof', 'Electric Heated Seats', '2500cc Engine'],
+    location: 'Nairobi',
+    images: [
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.50 PM.jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.50 PM (1).jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.51 PM.jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.51 PM (1).jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.51 PM (2).jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.52 PM.jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.52 PM (1).jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.53 PM.jpeg',
+      'Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.55 PM.jpeg',
+    ],
+  },
 ];
 
-// ─── WhatsApp number (replace with real number) ────────────────
-const WA_NUMBER = '254700000000';
+// LocalStorage loader
+function getStoredInventory() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Error parsing stored inventory:', e);
+    }
+  }
+  // Initialize with defaults if empty or invalid
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultCars));
+  return defaultCars.slice();
+}
+
+function saveInventoryToStorage(vehicles) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicles));
+}
+
+let cars = getStoredInventory();
+
+// Expose API on window for Admin Portal
+window.ThriftyInventory = {
+  getAll: () => getStoredInventory(),
+  saveAll: (data) => {
+    saveInventoryToStorage(data);
+    cars = data;
+    if (typeof renderCards === 'function') renderCards();
+  },
+  resetToDefaults: () => {
+    saveInventoryToStorage(defaultCars);
+    cars = defaultCars.slice();
+    if (typeof renderCards === 'function') renderCards();
+  }
+};
+
+// ─── WhatsApp number ───────────────────────────────────────────
+const WA_NUMBER = '254712916688';
 
 function waLink(carName) {
   const msg = encodeURIComponent(`Hi, I'm interested in the ${carName} listed on 3FTYWHLS. Please share more details.`);
@@ -176,9 +252,10 @@ let galleryIdx    = 0;
 
 // ─── Render helpers ────────────────────────────────────────────
 function filteredAndSorted() {
+  cars = getStoredInventory(); // sync with latest data
   let list = cars.slice();
   if (currentFilter !== 'all') {
-    list = list.filter(c => c.tags.includes(currentFilter));
+    list = list.filter(c => c.tags && c.tags.includes(currentFilter));
   }
   if (currentSort === 'price-asc')  list.sort((a, b) => a.priceNum - b.priceNum);
   if (currentSort === 'price-desc') list.sort((a, b) => b.priceNum - a.priceNum);

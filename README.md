@@ -18,13 +18,21 @@ A modern, dark-themed car dealership website built with HTML, CSS, and vanilla J
 - Honda Insight Hybrid — KSh 750K
 - Hyundai Santa Fe — KSh 2.4M
 - Land Rover Discovery IV XS SDV6 — KSh 4.5M
+- 2009 Toyota Vanguard — KSh 1.15M
+
+## Contact & Social Media
+- **Phone / WhatsApp:** +254 712 916 688
+- **TikTok:** @3ftywhls
+- **Instagram:** @3ftywhls
+- **Facebook:** Fe lix
+- **X (Twitter):** @3ftywhls
 
 ## Setup
 Just open `index.html` in any browser. No build step required.
 
-To update your WhatsApp number, edit line 15 of `app.js`:
+To update your WhatsApp number, edit line 195 of `app.js`:
 ```js
-const WA_NUMBER = '254700000000'; // replace with your number
+const WA_NUMBER = '254712916688';
 ```
 
 ---

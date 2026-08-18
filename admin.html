@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3FTYWHLS — Admin Management Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="admin-body">
+
+  <!-- PASSCODE LOCK SCREEN MODAL -->
+  <div class="pin-overlay open" id="pin-overlay">
+    <div class="pin-card">
+      <div class="pin-logo">
+        <span class="logo-mark">3FTY</span><span class="logo-accent">WHLS</span>
+      </div>
+      <h2>Admin Portal Access</h2>
+      <p>Enter security passcode to manage inventory</p>
+      
+      <form id="pin-form" onsubmit="event.preventDefault(); unlockAdmin();">
+        <div class="pin-input-wrap">
+          <input type="password" id="pin-input" placeholder="Enter Passcode" autocomplete="current-password" autofocus />
+          <button type="submit" class="btn btn-primary" id="pin-submit-btn">Unlock Portal</button>
+        </div>
+        <p class="pin-hint">Default passcode: <code>3FTY2026</code></p>
+        <div class="pin-error" id="pin-error">Incorrect passcode. Please try again.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN MAIN WRAPPER -->
+  <div class="admin-wrapper" id="admin-main" style="display: none;">
+
+    <!-- TOP NAVBAR -->
+    <header class="admin-nav">
+      <div class="admin-nav-inner">
+        <div class="admin-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-mark">3FTY</span><span class="logo-accent">WHLS</span>
+            <span class="admin-badge">ADMIN</span>
+          </a>
+        </div>
+
+        <div class="admin-nav-actions">
+          <button class="btn btn-outline btn-sm" id="btn-export-data" onclick="exportDataJSON()">
+            📥 Export JSON
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-import-data" onclick="triggerImportJSON()">
+            📤 Import JSON
+          </button>
+          <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importDataJSON(event)" />
+          
+          <button class="btn btn-primary btn-sm" id="btn-add-vehicle" onclick="openAddModal()">
+            ➕ Add New Vehicle
+          </button>
+          <a href="index.html" class="btn btn-outline btn-sm" target="_blank">🌐 Main Site</a>
+          <button class="btn btn-danger btn-sm" onclick="lockAdmin()">🔒 Lock</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container admin-container">
+
+      <!-- HEADER TITLE -->
+      <div class="admin-header-row">
+        <div>
+          <h1 class="admin-title">Inventory <span class="gradient-text">Management</span></h1>
+          <p class="admin-subtitle">Control vehicle listings, prices, status, and specs in real-time.</p>
+        </div>
+        <button class="btn btn-outline btn-sm btn-reset" onclick="confirmResetData()">
+          🔄 Reset To Defaults
+        </button>
+      </div>
+
+      <!-- METRICS CARDS -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="mc-icon">🚘</div>
+          <div class="mc-info">
+            <div class="mc-value" id="metric-total-cars">0</div>
+            <div class="mc-label">Total Vehicles</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="mc-icon">💰</div>
+          <div class="mc-info">
+            <div class="mc-value" id="metric-total-value">KSh 0M</div>
+            <div class="mc-label">Portfolio Value</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="mc-icon">🟢</div>
+          <div class="mc-info">
+            <div class="mc-value" id="metric-available-cars">0</div>
+            <div class="mc-label">Available Listings</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="mc-icon">🏷️</div>
+          <div class="mc-info">
+            <div class="mc-value" id="metric-sold-cars">0</div>
+            <div class="mc-label">Reserved / Sold</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROL BAR: SEARCH & FILTERS -->
+      <div class="admin-controls">
+        <div class="admin-search-wrap">
+          <input type="text" id="admin-search" placeholder="Search by name, model, spec..." oninput="renderAdminTable()" />
+        </div>
+        <div class="admin-filter-group">
+          <select id="admin-status-filter" onchange="renderAdminTable()">
+            <option value="all">All Statuses</option>
+            <option value="available">🟢 Available Only</option>
+            <option value="reserved">🟡 Reserved</option>
+            <option value="sold">🔴 Sold</option>
+          </select>
+          
+          <select id="admin-tag-filter" onchange="renderAdminTable()">
+            <option value="all">All Categories</option>
+            <option value="suv">SUVs</option>
+            <option value="sedan">Sedans</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="luxury">Luxury</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- INVENTORY TABLE -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>Category</th>
+                <th>Price (KSh)</th>
+                <th>Status</th>
+                <th>Year</th>
+                <th>Images</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body">
+              <!-- Rendered via admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADD / EDIT VEHICLE MODAL -->
+  <div class="modal-overlay" id="vehicle-modal">
+    <div class="admin-form-modal">
+      <div class="afm-header">
+        <h3 id="afm-title">Add New Vehicle</h3>
+        <button class="modal-close" onclick="closeVehicleModal()">✕</button>
+      </div>
+
+      <form id="vehicle-form" onsubmit="event.preventDefault(); saveVehicleForm();">
+        <input type="hidden" id="form-car-id" />
+
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Vehicle Name / Title *</label>
+            <input type="text" id="form-name" placeholder="e.g. 2018 Toyota Landcruiser Prado" required />
+          </div>
+
+          <div class="form-group full-width">
+            <label>Subtitle / Tagline *</label>
+            <input type="text" id="form-subtitle" placeholder="e.g. TX-L Diesel Turbo 7-Seater · Panoramic Sunroof" required />
+          </div>
+
+          <div class="form-group">
+            <label>Display Price (Text) *</label>
+            <input type="text" id="form-price" placeholder="e.g. KSh 5.8M" required />
+          </div>
+
+          <div class="form-group">
+            <label>Numeric Price (for sorting) *</label>
+            <input type="number" id="form-price-num" placeholder="e.g. 5800000" required />
+          </div>
+
+          <div class="form-group">
+            <label>Status *</label>
+            <select id="form-status" required>
+              <option value="available">🟢 Available</option>
+              <option value="reserved">🟡 Reserved</option>
+              <option value="sold">🔴 Sold</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Negotiable?</label>
+            <div class="toggle-checkbox">
+              <input type="checkbox" id="form-negotiable" />
+              <span>Price is negotiable</span>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Categories / Tags (select all that apply)</label>
+            <div class="tags-checkboxes">
+              <label><input type="checkbox" value="suv" class="tag-chk" /> SUV</label>
+              <label><input type="checkbox" value="sedan" class="tag-chk" /> Sedan</label>
+              <label><input type="checkbox" value="hybrid" class="tag-chk" /> Hybrid</label>
+              <label><input type="checkbox" value="luxury" class="tag-chk" /> Luxury</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Engine Spec</label>
+            <input type="text" id="spec-engine" placeholder="e.g. 2800cc Turbo Diesel" />
+          </div>
+
+          <div class="form-group">
+            <label>Year Spec</label>
+            <input type="text" id="spec-year" placeholder="e.g. 2018" />
+          </div>
+
+          <div class="form-group">
+            <label>Seats Spec</label>
+            <input type="text" id="spec-seats" placeholder="e.g. 7 Seater" />
+          </div>
+
+          <div class="form-group">
+            <label>Fuel Type Spec</label>
+            <input type="text" id="spec-fuel" placeholder="e.g. Diesel / Petrol" />
+          </div>
+
+          <div class="form-group full-width">
+            <label>Features (comma separated)</label>
+            <input type="text" id="form-features" placeholder="e.g. Panoramic Sunroof, 7 Seater, Leather Interior, 4WD" />
+          </div>
+
+          <div class="form-group full-width">
+            <label>Image Paths / Upload</label>
+            <p class="input-hint">Enter relative paths (separated by newlines) OR upload local images below:</p>
+            <textarea id="form-images-text" rows="4" placeholder="Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.50 PM.jpeg&#10;Toyota vanguard/WhatsApp Image 2026-08-18 at 11.36.51 PM.jpeg"></textarea>
+            
+            <div class="file-uploader-wrap">
+              <input type="file" id="form-image-files" multiple accept="image/*" onchange="handleImageFiles(event)" />
+              <div class="upload-btn-fake">📷 Select Local Image Files</div>
+            </div>
+            <div class="image-previews" id="image-previews"></div>
+          </div>
+        </div>
+
+        <div class="afm-footer">
+          <button type="button" class="btn btn-outline" onclick="closeVehicleModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="form-submit-btn">Save Vehicle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- QUICK PRICE MODAL -->
+  <div class="modal-overlay" id="price-modal">
+    <div class="admin-mini-modal">
+      <h3>Quick Update Price</h3>
+      <p id="qp-car-name">Car Title</p>
+      
+      <form onsubmit="event.preventDefault(); saveQuickPrice();">
+        <input type="hidden" id="qp-car-id" />
+        <div class="form-group">
+          <label>Display Price Text</label>
+          <input type="text" id="qp-price-text" placeholder="e.g. KSh 1.2M" required />
+        </div>
+        <div class="form-group">
+          <label>Numeric Price (KSh)</label>
+          <input type="number" id="qp-price-num" placeholder="e.g. 1200000" required />
+        </div>
+        <div class="mini-modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closePriceModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Price</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
