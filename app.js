@@ -221,9 +221,26 @@ function saveInventoryToStorage(vehicles) {
 
 let cars = getStoredInventory();
 
-// Expose API on window for Admin Portal
+// Async Neon Database Sync
+async function syncInventoryWithNeon() {
+  if (window.NeonInventory && window.NeonInventory.isConfigured()) {
+    try {
+      const dbVehicles = await window.NeonInventory.fetchAll();
+      if (Array.isArray(dbVehicles) && dbVehicles.length > 0) {
+        cars = dbVehicles;
+        saveInventoryToStorage(dbVehicles);
+        if (typeof renderCards === 'function') renderCards();
+        console.log('✅ Inventory synced from Neon Database');
+      }
+    } catch (err) {
+      console.warn('⚠️ Syncing with Neon DB failed, using local storage cache:', err.message);
+    }
+  }
+}
+
+// Expose API on window for Admin Portal & App Logic
 window.ThriftyInventory = {
-  getAll: () => getStoredInventory(),
+  getAll: () => cars,
   saveAll: (data) => {
     saveInventoryToStorage(data);
     cars = data;
@@ -233,8 +250,14 @@ window.ThriftyInventory = {
     saveInventoryToStorage(defaultCars);
     cars = defaultCars.slice();
     if (typeof renderCards === 'function') renderCards();
-  }
+  },
+  syncNeon: syncInventoryWithNeon
 };
+
+// Trigger Neon Sync on load
+document.addEventListener('DOMContentLoaded', () => {
+  syncInventoryWithNeon();
+});
 
 // ─── WhatsApp number ───────────────────────────────────────────
 const WA_NUMBER = '254712916688';

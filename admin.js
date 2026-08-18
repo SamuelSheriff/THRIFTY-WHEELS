@@ -6,7 +6,6 @@ const ADMIN_PIN = '3FTY2026';
 const AUTH_KEY = '3ftywhls_admin_auth';
 
 let editingCarId = null;
-let uploadedDataUrls = [];
 
 // ─── Auth / Lock Screen ─────────────────────────────────────────
 function checkAuth() {
@@ -17,6 +16,7 @@ function checkAuth() {
   if (isAuth) {
     overlay.classList.remove('open');
     main.style.display = 'block';
+    updateNeonStatusBadge();
     renderAdminTable();
     updateMetrics();
   } else {
@@ -48,6 +48,53 @@ function lockAdmin() {
   showToast('🔒 Portal Locked');
 }
 
+// ─── Neon Database Connection UI ────────────────────────────────
+function updateNeonStatusBadge() {
+  const btn = document.getElementById('neon-status-btn');
+  const textEl = document.getElementById('neon-status-text');
+
+  if (window.NeonInventory && window.NeonInventory.isConfigured()) {
+    btn.classList.remove('unconfigured');
+    textEl.textContent = 'Neon: Connected 🟢';
+  } else {
+    btn.classList.add('unconfigured');
+    textEl.textContent = 'Neon: Local Fallback 🟡';
+  }
+}
+
+function openNeonModal() {
+  const connInput = document.getElementById('neon-url-input');
+  connInput.value = window.NeonInventory ? window.NeonInventory.getConnString() : '';
+  document.getElementById('neon-modal').classList.add('open');
+}
+
+function closeNeonModal() {
+  document.getElementById('neon-modal').classList.remove('open');
+}
+
+async function saveNeonSettings() {
+  const connUrl = document.getElementById('neon-url-input').value.trim();
+  
+  if (window.NeonInventory) {
+    window.NeonInventory.setConnString(connUrl);
+    updateNeonStatusBadge();
+    closeNeonModal();
+
+    if (connUrl) {
+      showToast('⚡ Connecting to Neon Postgres...');
+      try {
+        await window.ThriftyInventory.syncNeon();
+        renderAdminTable();
+        showToast('🟢 Neon Database Connected & Synced!');
+      } catch (err) {
+        showToast('⚠️ Failed to query Neon DB. Check connection string.');
+      }
+    } else {
+      showToast('🟡 Switched to Local Storage Mode');
+    }
+  }
+}
+
 // ─── Metrics Dashboard ─────────────────────────────────────────
 function updateMetrics() {
   const vehicles = window.ThriftyInventory ? window.ThriftyInventory.getAll() : [];
@@ -67,11 +114,10 @@ function updateMetrics() {
   document.getElementById('metric-sold-cars').textContent = soldCars;
 }
 
-// ─── Table Rendering ───────────────────────────────────────────
+// ─── Dual View Rendering (Desktop Table & Mobile Cards) ────────
 function renderAdminTable() {
   updateMetrics();
   const vehicles = window.ThriftyInventory ? window.ThriftyInventory.getAll() : [];
-  const tbody = document.getElementById('admin-table-body');
   
   const query = (document.getElementById('admin-search')?.value || '').toLowerCase();
   const statusFilter = document.getElementById('admin-status-filter')?.value || 'all';
@@ -89,6 +135,8 @@ function renderAdminTable() {
     return matchesSearch && matchesStatus && matchesTag;
   });
 
+  // 1. Render Desktop Table
+  const tbody = document.getElementById('admin-table-body');
   tbody.innerHTML = '';
 
   if (filtered.length === 0) {
@@ -98,60 +146,110 @@ function renderAdminTable() {
           No vehicles match your filter criteria.
         </td>
       </tr>`;
+  } else {
+    filtered.forEach(v => {
+      const tr = document.createElement('tr');
+      const thumbSrc = v.images && v.images.length > 0 ? v.images[0] : '';
+      const status = v.status || 'available';
+      
+      let yearSpec = 'N/A';
+      if (v.specs) {
+        const y = v.specs.find(s => s.label.toLowerCase() === 'year');
+        if (y) yearSpec = y.value;
+      }
+
+      const tagsHtml = (v.tags || []).map(t => `<span class="tag-chip">${t}</span>`).join('');
+
+      tr.innerHTML = `
+        <td>
+          <div class="table-car-cell">
+            <img src="${thumbSrc}" alt="${v.name}" class="table-thumb" onerror="this.src='https://via.placeholder.com/80x60?text=No+Img'" />
+            <div>
+              <div class="table-car-name">${v.name}</div>
+              <div class="table-car-sub">${v.subtitle || ''}</div>
+            </div>
+          </div>
+        </td>
+        <td>${tagsHtml}</td>
+        <td>
+          <span class="price-text">${v.price}</span>
+          ${v.negotiable ? '<span class="neg-pill">neg.</span>' : ''}
+        </td>
+        <td>
+          <span class="status-badge ${status}" onclick="cycleCarStatus('${v.id}')" style="cursor: pointer;" title="Click to change status">
+            ${status} 🔄
+          </span>
+        </td>
+        <td>${yearSpec}</td>
+        <td>📷 ${v.images ? v.images.length : 0}</td>
+        <td style="text-align: right;">
+          <div class="action-btns">
+            <button class="btn-act btn-act-price" onclick="openQuickPrice('${v.id}')" title="Quick Edit Price">💰 Price</button>
+            <button class="btn-act btn-act-edit" onclick="openEditModal('${v.id}')" title="Edit Specs">✏️ Edit</button>
+            <button class="btn-act btn-act-delete" onclick="deleteVehicle('${v.id}')" title="Delete Listing">🗑️</button>
+          </div>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // 2. Render Mobile Vehicle Cards
+  renderMobileCards(filtered);
+}
+
+function renderMobileCards(filtered) {
+  const container = document.getElementById('mobile-cards-grid');
+  container.innerHTML = '';
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text3);">No vehicles match your filter criteria.</div>`;
     return;
   }
 
   filtered.forEach(v => {
-    const tr = document.createElement('tr');
+    const card = document.createElement('div');
+    card.className = 'mobile-car-card';
     
     const thumbSrc = v.images && v.images.length > 0 ? v.images[0] : '';
     const status = v.status || 'available';
-    
-    let yearSpec = 'N/A';
-    if (v.specs) {
-      const y = v.specs.find(s => s.label.toLowerCase() === 'year');
-      if (y) yearSpec = y.value;
-    }
-
     const tagsHtml = (v.tags || []).map(t => `<span class="tag-chip">${t}</span>`).join('');
 
-    tr.innerHTML = `
-      <td>
-        <div class="table-car-cell">
-          <img src="${thumbSrc}" alt="${v.name}" class="table-thumb" onerror="this.src='https://via.placeholder.com/80x60?text=No+Img'" />
-          <div>
-            <div class="table-car-name">${v.name}</div>
-            <div class="table-car-sub">${v.subtitle || ''}</div>
+    card.innerHTML = `
+      <div class="mcc-header">
+        <img src="${thumbSrc}" alt="${v.name}" class="mcc-thumb" onerror="this.src='https://via.placeholder.com/80x60?text=No+Img'" />
+        <div class="mcc-info">
+          <div class="mcc-title">${v.name}</div>
+          <div class="mcc-sub">${v.subtitle || ''}</div>
+          <div style="margin-top: 6px;">
+            <span class="status-badge ${status}" onclick="cycleCarStatus('${v.id}')" style="cursor: pointer;">
+              ${status} 🔄
+            </span>
           </div>
         </div>
-      </td>
-      <td>${tagsHtml}</td>
-      <td>
-        <span class="price-text">${v.price}</span>
-        ${v.negotiable ? '<span class="neg-pill">neg.</span>' : ''}
-      </td>
-      <td>
-        <span class="status-badge ${status}" onclick="cycleCarStatus('${v.id}')" style="cursor: pointer;" title="Click to change status">
-          ${status} 🔄
-        </span>
-      </td>
-      <td>${yearSpec}</td>
-      <td>📷 ${v.images ? v.images.length : 0}</td>
-      <td style="text-align: right;">
-        <div class="action-btns">
-          <button class="btn-act btn-act-price" onclick="openQuickPrice('${v.id}')" title="Quick Edit Price">💰 Price</button>
-          <button class="btn-act btn-act-edit" onclick="openEditModal('${v.id}')" title="Edit Vehicle Specs & Info">✏️ Edit</button>
-          <button class="btn-act btn-act-delete" onclick="deleteVehicle('${v.id}')" title="Delete Listing">🗑️</button>
+      </div>
+      <div class="mcc-mid">
+        <div>
+          <span class="mcc-price">${v.price}</span>
+          ${v.negotiable ? '<span class="neg-pill">neg.</span>' : ''}
         </div>
-      </td>
+        <div>${tagsHtml}</div>
+      </div>
+      <div class="mcc-actions">
+        <button class="btn-act btn-act-edit" onclick="openEditModal('${v.id}')">✏️ Edit</button>
+        <button class="btn-act btn-act-price" onclick="openQuickPrice('${v.id}')">💰 Price</button>
+        <button class="btn-act" onclick="cycleCarStatus('${v.id}')">🔄 Status</button>
+        <button class="btn-act btn-act-delete" onclick="deleteVehicle('${v.id}')">🗑️ Delete</button>
+      </div>
     `;
 
-    tbody.appendChild(tr);
+    container.appendChild(card);
   });
 }
 
 // ─── Status Cycle Helper ───────────────────────────────────────
-function cycleCarStatus(id) {
+async function cycleCarStatus(id) {
   const vehicles = window.ThriftyInventory.getAll();
   const car = vehicles.find(v => v.id === id);
   if (!car) return;
@@ -164,6 +262,15 @@ function cycleCarStatus(id) {
   };
 
   car.status = nextMap[current] || 'available';
+  
+  if (window.NeonInventory && window.NeonInventory.isConfigured()) {
+    try {
+      await window.NeonInventory.saveVehicle(car);
+    } catch (e) {
+      console.warn('Neon status save error:', e.message);
+    }
+  }
+
   window.ThriftyInventory.saveAll(vehicles);
   renderAdminTable();
   showToast(`Updated status to ${car.status.toUpperCase()}`);
@@ -172,7 +279,6 @@ function cycleCarStatus(id) {
 // ─── Add & Edit Modal Logic ────────────────────────────────────
 function openAddModal() {
   editingCarId = null;
-  uploadedDataUrls = [];
   document.getElementById('afm-title').textContent = 'Add New Vehicle';
   document.getElementById('vehicle-form').reset();
   document.getElementById('form-car-id').value = '';
@@ -188,7 +294,6 @@ function openEditModal(id) {
   if (!car) return;
 
   editingCarId = id;
-  uploadedDataUrls = [];
 
   document.getElementById('afm-title').textContent = `Edit — ${car.name}`;
   document.getElementById('form-car-id').value = car.id;
@@ -267,7 +372,7 @@ function handleImageFiles(e) {
   });
 }
 
-function saveVehicleForm() {
+async function saveVehicleForm() {
   const vehicles = window.ThriftyInventory.getAll();
   
   const id = editingCarId || `car-${Date.now()}`;
@@ -281,7 +386,7 @@ function saveVehicleForm() {
   // Tags
   const tags = [];
   document.querySelectorAll('.tag-chk:checked').forEach(chk => tags.push(chk.value));
-  if (tags.length === 0) tags.push('suv'); // default tag
+  if (tags.length === 0) tags.push('suv');
 
   // Specs
   const specs = [];
@@ -325,6 +430,16 @@ function saveVehicleForm() {
     vehicles.unshift(carObj);
   }
 
+  // Save to Neon DB if configured
+  if (window.NeonInventory && window.NeonInventory.isConfigured()) {
+    try {
+      await window.NeonInventory.saveVehicle(carObj);
+      showToast('⚡ Saved to Neon Postgres');
+    } catch (e) {
+      console.warn('Neon save failed:', e.message);
+    }
+  }
+
   window.ThriftyInventory.saveAll(vehicles);
   closeVehicleModal();
   renderAdminTable();
@@ -349,7 +464,7 @@ function closePriceModal() {
   document.getElementById('price-modal').classList.remove('open');
 }
 
-function saveQuickPrice() {
+async function saveQuickPrice() {
   const id = document.getElementById('qp-car-id').value;
   const priceText = document.getElementById('qp-price-text').value.trim();
   const priceNum = Number(document.getElementById('qp-price-num').value) || 0;
@@ -359,6 +474,15 @@ function saveQuickPrice() {
   if (car) {
     car.price = priceText;
     car.priceNum = priceNum;
+
+    if (window.NeonInventory && window.NeonInventory.isConfigured()) {
+      try {
+        await window.NeonInventory.saveVehicle(car);
+      } catch (e) {
+        console.warn('Neon quick price save error:', e.message);
+      }
+    }
+
     window.ThriftyInventory.saveAll(vehicles);
     closePriceModal();
     renderAdminTable();
@@ -367,12 +491,20 @@ function saveQuickPrice() {
 }
 
 // ─── Delete & Reset ────────────────────────────────────────────
-function deleteVehicle(id) {
+async function deleteVehicle(id) {
   const vehicles = window.ThriftyInventory.getAll();
   const car = vehicles.find(v => v.id === id);
   if (!car) return;
 
   if (confirm(`Are you sure you want to delete "${car.name}" from inventory?`)) {
+    if (window.NeonInventory && window.NeonInventory.isConfigured()) {
+      try {
+        await window.NeonInventory.deleteVehicle(id);
+      } catch (e) {
+        console.warn('Neon delete error:', e.message);
+      }
+    }
+
     const updated = vehicles.filter(v => v.id !== id);
     window.ThriftyInventory.saveAll(updated);
     renderAdminTable();
@@ -410,10 +542,15 @@ function importDataJSON(e) {
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = (event) => {
+  reader.onload = async (event) => {
     try {
       const data = JSON.parse(event.target.result);
       if (Array.isArray(data) && data.length > 0) {
+        if (window.NeonInventory && window.NeonInventory.isConfigured()) {
+          for (const v of data) {
+            await window.NeonInventory.saveVehicle(v).catch(() => {});
+          }
+        }
         window.ThriftyInventory.saveAll(data);
         renderAdminTable();
         showToast('📤 Inventory Imported Successfully!');

@@ -27,13 +27,17 @@ A modern, dark-themed car dealership website built with HTML, CSS, and vanilla J
 - **Facebook:** Fe lix
 - **X (Twitter):** @3ftywhls
 
-## Setup
-Just open `index.html` in any browser. No build step required.
+## Setup & Admin Access
+1. Just open `index.html` in any browser. No build step required.
+2. Open **Admin Management Portal** at [`admin.html`](file:///d:/PROGRAMMING%20FOLDER/3ftywhls/admin.html) or click **⚙️ Admin** in navigation.
+3. Passcode: `3FTY2026`
 
-To update your WhatsApp number, edit line 195 of `app.js`:
-```js
-const WA_NUMBER = '254712916688';
-```
+## 🐘 Neon Database Integration (Optional Serverless Cloud Sync)
+To connect your **Neon Serverless PostgreSQL Database** (console.neon.tech):
+1. Open your **Neon Console** -> **SQL Editor**.
+2. Copy and run the contents of [`schema.sql`](file:///d:/PROGRAMMING%20FOLDER/3ftywhls/schema.sql) to create the `vehicles` table.
+3. In the Admin Dashboard (`admin.html`), click **🐘 Neon DB** in the top bar and paste your **Neon Connection String** (`postgresql://user:pass@ep-name.us-east-2.aws.neon.tech/neondb?sslmode=require`).
+4. Click **Save Connection**. All additions, edits, and price changes will now sync live to your Neon Postgres database!
 
 ---
 *© 2026 3FTYWHLS — Thrifty Wheels. Nairobi, Kenya.*

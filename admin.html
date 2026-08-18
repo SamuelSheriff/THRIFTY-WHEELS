@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="admin.css" />
+  <!-- Neon Serverless Driver -->
+  <script src="https://cdn.jsdelivr.net/npm/@neondatabase/serverless@0.10.0/dist/index.iife.js"></script>
 </head>
 <body class="admin-body">
 
@@ -46,19 +48,23 @@
         </div>
 
         <div class="admin-nav-actions">
-          <button class="btn btn-outline btn-sm" id="btn-export-data" onclick="exportDataJSON()">
-            📥 Export JSON
+          <button class="btn btn-outline btn-sm neon-status-btn" id="neon-status-btn" onclick="openNeonModal()" title="Neon DB Settings">
+            🐘 <span id="neon-status-text">Neon DB</span>
           </button>
-          <button class="btn btn-outline btn-sm" id="btn-import-data" onclick="triggerImportJSON()">
-            📤 Import JSON
+          
+          <button class="btn btn-outline btn-sm" id="btn-export-data" onclick="exportDataJSON()" title="Export JSON Backup">
+            📥 <span class="nav-btn-text">Export</span>
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-import-data" onclick="triggerImportJSON()" title="Import JSON Backup">
+            📤 <span class="nav-btn-text">Import</span>
           </button>
           <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="importDataJSON(event)" />
           
           <button class="btn btn-primary btn-sm" id="btn-add-vehicle" onclick="openAddModal()">
-            ➕ Add New Vehicle
+            ➕ <span class="nav-btn-text">Add Vehicle</span>
           </button>
-          <a href="index.html" class="btn btn-outline btn-sm" target="_blank">🌐 Main Site</a>
-          <button class="btn btn-danger btn-sm" onclick="lockAdmin()">🔒 Lock</button>
+          <a href="index.html" class="btn btn-outline btn-sm nav-site-btn" target="_blank">🌐 <span class="nav-btn-text">Main Site</span></a>
+          <button class="btn btn-danger btn-sm" onclick="lockAdmin()" title="Lock Admin Panel">🔒 <span class="nav-btn-text">Lock</span></button>
         </div>
       </div>
     </header>
@@ -134,8 +140,8 @@
         </div>
       </div>
 
-      <!-- INVENTORY TABLE -->
-      <div class="table-card">
+      <!-- DESKTOP INVENTORY TABLE -->
+      <div class="table-card" id="table-card">
         <div class="table-responsive">
           <table class="admin-table">
             <thead>
@@ -156,6 +162,36 @@
         </div>
       </div>
 
+      <!-- MOBILE VEHICLE CARDS GRID (Sleek mobile card view) -->
+      <div class="mobile-cards-grid" id="mobile-cards-grid">
+        <!-- Rendered via admin.js on mobile screens -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NEON DATABASE SETTINGS MODAL -->
+  <div class="modal-overlay" id="neon-modal">
+    <div class="admin-mini-modal">
+      <h3>🐘 Neon Database Settings</h3>
+      <p style="color: var(--text2); font-size: 0.84rem; margin-bottom: 16px;">
+        Paste your Neon Postgres Database Connection String from your console (<code>console.neon.tech</code>).
+      </p>
+
+      <form onsubmit="event.preventDefault(); saveNeonSettings();">
+        <div class="form-group">
+          <label>Neon Database URL</label>
+          <input type="password" id="neon-url-input" placeholder="postgresql://user:password@ep-name.us-east-2.aws.neon.tech/neondb?sslmode=require" />
+        </div>
+        <p class="input-hint" style="margin-top: 6px;">
+          Note: Run <code>schema.sql</code> once in Neon SQL Editor to create the <code>vehicles</code> table.
+        </p>
+
+        <div class="mini-modal-actions" style="margin-top: 20px;">
+          <button type="button" class="btn btn-outline" onclick="closeNeonModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Connection</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -291,6 +327,7 @@
   <!-- TOAST NOTIFICATION -->
   <div class="toast" id="toast"></div>
 
+  <script src="neon.js"></script>
   <script src="app.js"></script>
   <script src="admin.js"></script>
 </body>
