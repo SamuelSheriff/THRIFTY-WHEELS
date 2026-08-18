@@ -576,13 +576,6 @@ async function deleteVehicle(id) {
   }
 }
 
-function confirmResetData() {
-  if (confirm('Are you sure you want to reset inventory back to default cars? Any custom additions will be overwritten.')) {
-    window.ThriftyInventory.resetToDefaults();
-    renderAdminTable();
-    showToast('🔄 Inventory Reset to Defaults');
-  }
-}
 
 // ─── Import & Export JSON ──────────────────────────────────────
 function exportDataJSON() {
